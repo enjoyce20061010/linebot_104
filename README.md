@@ -13,6 +13,6 @@ The Event Log workflows retain their query and write behavior. Their Postgres cr
 
 The LINE RAG and MCP workflows use separate LINE channel access tokens. The MCP push target is configurable through `LINE_MCP_PUSH_TARGET_USER_ID`.
 
-LINE QR image locations are reserved in `assets/line-rag/` and `assets/mcp-tool/`; no QR images are included yet.
+Workflow diagrams are included both in `assets/` and beside their corresponding workflow exports under `workflows/`. LINE QR image locations are reserved in `assets/line-rag/` and `assets/mcp-tool/`; no QR images are included yet.
 
 See [SECURITY.md](SECURITY.md) before publishing or importing credential-bearing workflow exports.
