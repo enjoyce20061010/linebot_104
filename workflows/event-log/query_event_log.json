@@ -1,0 +1,73 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "query_event_log",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -432,
+        -288
+      ],
+      "id": "703bc8f8-418a-49de-92b6-07d9290f288d",
+      "name": "Webhook Query Event Log"
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT\n  event_id,\n  task_id,\n  customer_id,\n  channel,\n  channel_user_id,\n  message_id,\n  event_type,\n  payload_kind,\n  text,\n  raw_payload,\n  meta,\n  created_at\nFROM event_log\nWHERE meta->'mvp'->>'name' = 'hermes_openclaw_line'\n  AND meta->'mvp'->>'step_id' = '{{ $json.body.step_id || \\\"STEP_A\\\" }}'\n  AND meta->'mvp'->>'runtime' = '{{ $json.body.runtime }}'\n  AND meta->'mvp'->>'source_agent' = '{{ $json.body.source_agent }}'\nORDER BY created_at DESC\nLIMIT {{ $json.body.limit || 20 }};",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        -256,
+        -288
+      ],
+      "id": "7b30d809-1300-4732-8c32-bf85647f8cb2",
+      "name": "Query event_log"
+    },
+    {
+      "parameters": {
+        "jsCode": "const rows = $input.all().map(item => item.json);\n\nreturn [\n  {\n    json: {\n      status: 'success',\n      count: rows.length,\n      rows,\n      query: {\n        name: 'hermes_openclaw_line',\n        step_id: $('Webhook Query Event Log').first().json.body.step_id || 'STEP_A',\n        runtime: $('Webhook Query Event Log').first().json.body.runtime,\n        source_agent: $('Webhook Query Event Log').first().json.body.source_agent,\n        limit: $('Webhook Query Event Log').first().json.body.limit || 20\n      }\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -48,
+        -288
+      ],
+      "id": "43bd12ff-30a3-4e60-8870-58315d008593",
+      "name": "Build Query Response"
+    }
+  ],
+  "connections": {
+    "Webhook Query Event Log": {
+      "main": [
+        [
+          {
+            "node": "Query event_log",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query event_log": {
+      "main": [
+        [
+          {
+            "node": "Build Query Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {}
+}
